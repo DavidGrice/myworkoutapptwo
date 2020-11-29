@@ -6,9 +6,54 @@ import LinearGradient from 'react-native-linear-gradient';
 import { openDatabase } from 'react-native-sqlite-storage';
 import Logo from '../Assets/Images/Splash_image.png';
 
+let db = openDatabase({ name: 'Users.db'});
+
 const Login = ({ navigation }) => {
     let [inputUserName, setInputUsername] = useState('')
     let [inputPassword, setInputPassword] = useState('')
+
+    useEffect(() => {
+        db.transaction(function (transaxion) {
+            let sqlStatement = `SELECT name FROM sqlite_master WHERE
+                                type='table' AND name='users_table'`
+            transaxion.executeSql(sqlStatement, [],
+                function(transacion, results) {
+                    console.log('item:', results.rows.length);
+                    if (results.rows.length == 0) {
+                        transaxion.executeSql("DROP TABLE IF EXISTS users_table", []);
+                        transaxion.executeSql(
+                            `CREATE TABLE IF NOT EXISTS users_table(
+                                user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                user_name VARCHAR(20) NOT NULL,
+                                user_password VARCHAR(20) NOT NULL,
+                                first_name VARCHAR(20) NOT NULL,
+                                last_name VARCHAR(20) NOT NULL,
+                                user_token VARCHAR(64) NOT NULL)`,
+                            []
+                        );
+                    }
+                }
+            );
+        });
+    }, []);
+
+    let userSearch = () => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                'SELECT * from users_table where user_name = ? AND user_password = ?',
+                [inputUserName, inputPassword],
+                (txn, results) => {
+                    let leng = results.rows.length;
+                    if (leng > 0){
+                        let result = results.rows.item(0);
+                        console.log('Success!!!!!')
+                    } else {
+                        alert('Failed to login')
+                    }
+                }
+            )
+        })
+    }
 
     return (
         <SafeAreaView style={styles.mainBody}>
@@ -61,13 +106,14 @@ const Login = ({ navigation }) => {
                                     <Button
                                         title={"Login"}
                                         color="#4A4DE7"
-                                        
+                                        onPress={userSearch}
                                     ></Button>
                                 </View>
                                 <View style={styles.signupView}>
                                     <TouchableOpacity>
                                         <Text
                                             style={styles.signupText}
+                                            onPress={() => navigation.navigate('Signup')}
                                         >Don't have an account? Tap here!</Text>
                                     </TouchableOpacity>
                                 </View>
