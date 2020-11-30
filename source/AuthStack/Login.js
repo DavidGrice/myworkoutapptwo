@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Text, Button, View, SafeAreaView, StyleSheet, Image,
          TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 
@@ -8,22 +8,23 @@ import Logo from '../Assets/Images/Splash_image.png';
 
 let db = openDatabase({ name: 'Users.db'});
 
-const Login = ({ navigation }) => {
-    let [inputUserName, setInputUsername] = useState('')
-    let [inputPassword, setInputPassword] = useState('')
+const Login = () => {
+    let [inputUserName, setInputUserName] = useState('');
+    let [inputPassword, setInputPassword] = useState('');
 
     useEffect(() => {
+
         db.transaction(function (transaxion) {
-            let sqlStatement = `SELECT name FROM sqlite_master WHERE
-                                type='table' AND name='users_table'`
+            let sqlStatement = `SELECT name FROM sqlite_master 
+                                WHERE type='table' and name='users_table'`
             transaxion.executeSql(sqlStatement, [],
                 function(transacion, results) {
-                    console.log('item:', results.rows.length);
-                    if (results.rows.length == 0) {
+                    console.log('User:', results.rows.length);
+                    if (results.rows.length == 0){
                         transaxion.executeSql("DROP TABLE IF EXISTS users_table", []);
                         transaxion.executeSql(
-                            `CREATE TABLE IF NOT EXISTS users_table(
-                                user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            `CREATE TABLE IF NOT EXISTS users_table (
+                                user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                                 user_name VARCHAR(20) NOT NULL,
                                 user_password VARCHAR(20) NOT NULL,
                                 first_name VARCHAR(20) NOT NULL,
@@ -40,99 +41,93 @@ const Login = ({ navigation }) => {
     let userSearch = () => {
         db.transaction((tx) => {
             tx.executeSql(
-                'SELECT * from users_table where user_name = ? AND user_password = ?',
-                [inputUserName, inputPassword],
-                (txn, results) => {
-                    let leng = results.rows.length;
-                    if (leng > 0){
-                        let result = results.rows.item(0);
-                        console.log('Success!!!!!')
-                    } else {
-                        alert('Failed to login')
-                    }
+            'SELECT * from users_table WHERE user_name = ? AND user_password = ?',
+            [inputUserName, inputPassword],
+            (txn,results) => {
+                let leng = results.rows.length;
+                if (leng > 0) {
+                    let result = results.rows.item(0);
+                    // Change later on for signing into homestack
+                    console.log("Success! User/password found!");
+                } else {
+                    alert('Failed to login');
                 }
+            }
             )
         })
-    }
+    };
 
     return (
         <SafeAreaView style={styles.mainBody}>
 
             <LinearGradient
-            colors={['purple', 'darkblue']}
+            colors={['purple','darkblue']}
             style={styles.mainContainer}
             >
 
-                <ScrollView keyboardShouldPersistTaps="handled" >
+                <ScrollView keyboardShouldPersistTaps="handled">
                     <KeyboardAvoidingView
-                        behavior="padding"
-                        >
+                    behavior="padding"
+                    >
+                        <View style={styles.subContainer}>
 
-                            <View style={styles.subContainer}>
+                            <Image
+                            source={Logo}
+                            style={styles.logoStyle}
+                            />
 
-                                <Image
-                                source={Logo}
-                                style={styles.logo}
+                            <View style={styles.sectionsStyling}>
+                                <TextInput
+                                    style={styles.inputTextStyle}
+                                    onChangeText={(inputUserName) => setInputUserName(inputUserName)}
+                                    underlineColorAndroid="#FFFFFF"
+                                    placeholder="Enter Username"
+                                    placeholderTextColor="white"
+                                    onSubmitEditing={Keyboard.dismiss}
+                                    autoCapitalize="none"
+                                    blurOnSubmit={false}
                                 />
-
-                                <View style={styles.sectionsStyling}>
-                                    <TextInput
-                                        style={styles.inputTextStyle}
-                                        onChangeText={(inputUserName) => setInputUsername(inputUserName)}
-                                        underlineColorAndroid="#FFFFFF"
-                                        placeholder="Enter Username"
-                                        placeholderTextColor="white"
-                                        onSubmitEditing={Keyboard.dismiss}
-                                        autoCapitalize="none"
-                                        blurOnSubmit={false}
-                                    />
-                                </View>
-
-                                <View style={styles.sectionsStyling}>
-                                    <TextInput 
-                                        style={styles.inputTextStyle}
-                                        onChangeText={(inputPassword) => setInputPassword(inputPassword)}
-                                        underlineColorAndroid="#FFFFFF"
-                                        placeholder="Enter Password"
-                                        placeholderTextColor="white"
-                                        keyboardType="default"
-                                        onSubmitEditing={Keyboard.dismiss}
-                                        blurOnSubmit={false}
-                                        secureTextEntry={true}
-                                    />
-                                </View>
-
-                                <View style={styles.loginButton}>
-                                    <Button
-                                        title={"Login"}
-                                        color="#4A4DE7"
-                                        onPress={userSearch}
-                                    ></Button>
-                                </View>
-                                <View style={styles.signupView}>
-                                    <TouchableOpacity>
-                                        <Text
-                                            style={styles.signupText}
-                                            onPress={() => navigation.navigate('Signup')}
-                                        >Don't have an account? Tap here!</Text>
-                                    </TouchableOpacity>
-                                </View>
-
+                            </View>
+                            <View style={styles.sectionsStyling}>
+                                <TextInput 
+                                    style={styles.inputTextStyle}
+                                    onChangeText={(inputPassword) => setInputPassword(inputPassword)}
+                                    underlineColorAndroid="#FFFFFF"
+                                    placeholder="Enter Password"
+                                    placeholderTextColor="white"
+                                    keyboardType="default"
+                                    onSubmitEditing={Keyboard.dismiss}
+                                    blurOnSubmit={false}
+                                    secureTextEntry={true}
+                                />
                             </View>
 
+                            <View style={styles.loginButton}>
+                                <Button
+                                    title={"Login"}
+                                    color="#4A4DE7"
+                                    onPress={userSearch}>
+                                </Button>
+                            </View>
+                            <View style={styles.signupView}>
+                                <TouchableOpacity>
+                                    <Text
+                                    style={styles.signupText}
+                                    >Don't have an account? Tap here!</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     </KeyboardAvoidingView>
                 </ScrollView>
-
             </LinearGradient>
-
         </SafeAreaView>
+        
     )
-}
+};
 
 export default Login;
 
 const styles = StyleSheet.create({
-
     mainBody: {
         flex: 1,
         alignSelf: 'center',
@@ -157,11 +152,11 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 500,
         width: 350,
-        backgroundColor: 'rgba(0, 0, 0, .5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         borderRadius: 20,
     },
 
-    logo: {
+    logoStyle: {
         width: '100%',
         height: '40%',
         resizeMode: 'stretch',
@@ -171,8 +166,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 40,
         marginTop: 20,
-        marginRight: 35,
         marginLeft: 35,
+        marginRight: 35,
         marginBottom: 10,
     },
 
@@ -208,5 +203,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'white',
         textAlign: 'center',
-    }
-})
+    },
+});
