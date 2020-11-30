@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native';
 import React, { useEffect, useState, useContext } from 'react';
 import { Text, Button, View, SafeAreaView, StyleSheet, Image,
          TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
@@ -8,7 +9,7 @@ import Logo from '../Assets/Images/Splash_image.png';
 
 let db = openDatabase({ name: 'Users.db'});
 
-const Login = () => {
+const Login = ({ navigation }) => {
     let [inputUserName, setInputUserName] = useState('');
     let [inputPassword, setInputPassword] = useState('');
 
@@ -113,6 +114,7 @@ const Login = () => {
                                 <TouchableOpacity>
                                     <Text
                                     style={styles.signupText}
+                                    onPress={() => {navigation.navigate('Signup')}}
                                     >Don't have an account? Tap here!</Text>
                                 </TouchableOpacity>
                             </View>
