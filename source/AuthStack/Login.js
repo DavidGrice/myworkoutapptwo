@@ -7,11 +7,14 @@ import LinearGradient from 'react-native-linear-gradient';
 import { openDatabase } from 'react-native-sqlite-storage';
 import Logo from '../Assets/Images/Splash_image.png';
 
+import { AuthContext } from '../Context';
+
 let db = openDatabase({ name: 'Users.db'});
 
 const Login = ({ navigation }) => {
     let [inputUserName, setInputUserName] = useState('');
     let [inputPassword, setInputPassword] = useState('');
+    let { signIn } = useContext(AuthContext)
 
     useEffect(() => {
 
@@ -49,7 +52,7 @@ const Login = ({ navigation }) => {
                 if (leng > 0) {
                     let result = results.rows.item(0);
                     // Change later on for signing into homestack
-                    console.log("Success! User/password found!");
+                    signIn(result.user_name, result.first_name, result.last_name, result.user_token)
                 } else {
                     alert('Failed to login');
                 }

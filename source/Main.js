@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useMemo, useReducer } from 'react';
 import { Text } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Splash from './Splash';
 
@@ -15,6 +17,8 @@ import Home from './HomeStack/Home';
 import Workout from './HomeStack/Workout';
 import Stats from './HomeStack/Stats';
 import Profile from './HomeStack/Profile';
+
+import { AuthContext } from './Context';
 
 const AuthStack = createStackNavigator();
 const AuthStackScreen = () => { 
@@ -81,19 +85,110 @@ const HomeTabsScreen = () => {
 const RootStack = createStackNavigator();
 
 const Main = () => {
+    
+    const initialAuthState = {
+        isLoading: true,
+        userName: null,
+        userFirstName: null,
+        userLastName: null,
+        userToken: null,
+    };
+
+    const loginReducerState = (prevState, actionState) => {
+        switch (actionState.type) {
+        case 'RETRIEVE_TOKEN':
+            return {
+                userToken: actionState.user_token,
+                isLoading: false,
+            }
+        case 'LOGIN':
+            return {
+                userName: actionState.user_name,
+                userFirstName: actionState.first_name,
+                userLastName: actionState.last_name,
+                userToken: actionState.user_token,
+                isLoading: false,
+            }
+        case 'LOGOUT':
+            return {
+                userName: null,
+                userFirstName: null,
+                userLastName: null,
+                userToken: null,
+                isLoading: false,
+            }
+        }
+    };
+
+    const [loginState, dispatchState] = useReducer(loginReducerState, initialAuthState);
+
+    let authenticationContext = useMemo(() => {
+        return {
+            signIn: async(userName, userFirstName, userLastName, userToken) => {
+                try {
+                    await AsyncStorage.setItem('userToken', userToken);
+                    await AsyncStorage.setItem('userFirstName', userFirstName);
+                    await AsyncStorage.setItem('userLastName', userLastName);
+                    await AsyncStorage.setItem('userName', userName);
+                } catch(error) {
+                    console.log(error)
+                }
+                dispatchState({type:'LOGIN', user_name: userName, first_name: userFirstName, last_name:userLastName, user_token: userToken})
+            },
+            signOut: async() => {
+                try {
+                    await AsyncStorage.removeItem('userToken');
+                    await AsyncStorage.removeItem('userFirstName');
+                    await AsyncStorage.removeItem('userLastName');
+                    await AsyncStorage.removeItem('userName');
+                } catch(error) {
+                    console.log(error)
+                }
+                dispatchState({type:'LOGOUT'})
+            },
+        }
+    }, [])
+
+    useEffect(() => {
+        setTimeout(async() => {
+            let userToken = null;
+
+            try {
+                userToken = await AsyncStorage.getItem('userToken');
+            } catch(error) {
+                console.log(error)
+            }
+            dispatchState({type: 'RETRIEVE_TOKEN', user_token: userToken})
+        }, 3000);
+
+    }, []);
+
+
+
+    if (loginState.isLoading){
+        return <Splash />
+    }
+
     return (
-        <NavigationContainer>
-            <RootStack.Navigator headerMode="none">
-                {/* <RootStack.Screen
-                name="Authstack"
-                component={AuthStackScreen}
-                /> */}
-                <RootStack.Screen
-                name="HomeTabs"
-                component={HomeTabsScreen}
-                />
-            </RootStack.Navigator>
-        </NavigationContainer>
+        <AuthContext.Provider value={authenticationContext}>
+            <NavigationContainer>
+                {loginState.userToken ? (
+                    <RootStack.Navigator headerMode="none">
+                        <RootStack.Screen
+                        name="HomeTabs"
+                        component={HomeTabsScreen}
+                        />
+                    </RootStack.Navigator>
+                ) : (
+                    <RootStack.Navigator headerMode="none">
+                        <RootStack.Screen
+                        name="AuthStack"
+                        component={AuthStackScreen}
+                        />
+                    </RootStack.Navigator>
+                )}
+            </NavigationContainer>
+        </AuthContext.Provider>
     );
 }
 
