@@ -8,17 +8,24 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
+// Splash Screen
 import Splash from './Splash';
 
+// Auth Stack
 import Login from './AuthStack/Login';
 import Signup from './AuthStack/Signup';
 
+// Home Stack
 import Home from './HomeStack/Home';
-import Workout from './HomeStack/Workout';
+import Workout from './HomeStack/WorkoutStack/Workout';
 import Stats from './HomeStack/Stats';
 import Profile from './HomeStack/Profile';
 
+// Workout Stack
+import CreateWorkout from './HomeStack/WorkoutStack/CreateWorkout';
+
 import { AuthContext } from './Context';
+
 
 const AuthStack = createStackNavigator();
 const AuthStackScreen = () => { 
@@ -53,7 +60,7 @@ const HomeTabsScreen = () => {
                     <Icon name={focused?"home":"home-outline"} style={{color:'white'}} size={24}/>
                 ),
             }}/>
-            <HomeTabs.Screen name="Workout" component={Workout}
+            <HomeTabs.Screen name="Workout" component={WorkoutStackScreen}
             options={{
                 tabBarLabel: 'Workout',
                 tabBarColor: 'purple',
@@ -78,6 +85,17 @@ const HomeTabsScreen = () => {
                 ),
             }} />
         </HomeTabs.Navigator>
+    )
+};
+
+const WorkoutStack = createStackNavigator();
+const WorkoutStackScreen = () => {
+    return (
+        <WorkoutStack.Navigator
+        headerMode="none">
+            <WorkoutStack.Screen name="Let's Workout" component={Workout} />
+            <WorkoutStack.Screen name="Create Workout" component={CreateWorkout} />
+        </WorkoutStack.Navigator>
     )
 };
 
