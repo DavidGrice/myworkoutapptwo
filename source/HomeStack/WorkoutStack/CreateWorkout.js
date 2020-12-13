@@ -34,7 +34,10 @@ const CreateWorkout = ({ navigation }) => {
                             <Button title="Cardio" color="purple" onPress={() => navigation.navigate("Cardio", {date: newDate})} />
                         </View>
                         <View style={styles.buttonView}>
-                            <Button title="back" color="purple" onPress={() => navigation.goBack()} />
+                            <Button title="Strength" color="purple" onPress={() => navigation.navigate("Strength", {date: newDate})} />
+                        </View>
+                        <View style={styles.buttonView}>
+                            <Button title="Back" color="purple" onPress={() => navigation.goBack()} />
                         </View>
                         
                     </View>
