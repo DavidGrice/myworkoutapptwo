@@ -25,6 +25,7 @@ import Profile from './HomeStack/Profile';
 import CreateWorkout from './HomeStack/WorkoutStack/CreateWorkout';
 import Cardio from './HomeStack/WorkoutStack/Cardio';
 import Strength from './HomeStack/WorkoutStack/Strength'
+import WorkoutHistory from './HomeStack/WorkoutStack/WorkoutHistory';
 
 import { AuthContext } from './Context';
 
@@ -99,6 +100,7 @@ const WorkoutStackScreen = () => {
             <WorkoutStack.Screen name="Create Workout" component={CreateWorkout} />
             <WorkoutStack.Screen name="Cardio" component={Cardio} />
             <WorkoutStack.Screen name="Strength" component={Strength} />
+            <WorkoutStack.Screen name="Workout History" component={WorkoutHistory} />
         </WorkoutStack.Navigator>
     )
 };

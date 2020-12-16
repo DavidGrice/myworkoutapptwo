@@ -97,6 +97,9 @@ const Workout = ({ navigation }) => {
                         <View style={styles.buttonViews}>
                             <Button color="purple" title="Create Workout" onPress={() => navigation.navigate('Create Workout')} />
                         </View>
+                        <View style={styles.buttonViews}>
+                            <Button color="purple" title="Workout History" onPress={() => navigation.navigate('Workout History')} />
+                        </View>
                     </View>
                 </View>
             </View>
