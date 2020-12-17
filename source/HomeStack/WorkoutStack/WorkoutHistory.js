@@ -63,7 +63,7 @@ const WorkoutHistory = ({ navigation }) => {
             key={item.user_token}
             style={styles.buttonDates}
             >
-                <Button title={textDate} color="salmon" />
+                <Button title={textDate} color="salmon" onPress={() => navigation.navigate("WorkoutHistorySummary", {date: item.workout_date})}/>
             </View>
         )
     }

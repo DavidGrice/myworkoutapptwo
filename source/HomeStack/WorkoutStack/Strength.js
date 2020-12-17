@@ -9,7 +9,7 @@ let errorCB = (err) => {
 };
 
 let SuccessCB = () => {
-    console.log("Opened Workout DB for Cardio");
+    console.log("Opened Workout DB for Strength");
 };
 
 let db = openDatabase({ name: 'Workout.db'}, SuccessCB, errorCB);
@@ -83,7 +83,7 @@ const Strength = ({ navigation, route }) => {
         db.transaction(function (txn) {
             let createSQLStatement = `INSERT INTO workout_strength(
                 workout_date, strength_muscle_group, strength_muscle, strength_duration,
-                strength_duration_type, strength_resistance, strenght_resistance_type,
+                strength_duration_type, strength_resistance, strength_resistance_type,
                 strength_repetition, strength_repetition_type, strength_calories_burned,
                 strength_heart_rate, strength_heart_rate_type, user_token, main_to_strength)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
